@@ -1,0 +1,77 @@
+Step1
+在小程序的项目根目录下新建一个 components 文件夹，用于存放我们以后开发中的所用组件，
+今天我们的目的是实现一个 弹框 组件，
+因此，我们在 components 组件中新建一个 Dialog 文件夹来存放我们的弹窗组件，
+在 Dialog 下右击新建 Component 并命名为 dialog 后，会生成对应的 json wxml wxss js 4个文件，也就是一个自定义组件的组成部分
+
+
+Step2
+组件初始化工作准备完成，接下来就是组件的相关配置，
+首先我们需要声明自定义组件，也就是将 dialog.json 中 component 字段设为 true ：
+{
+  "component": true,        // 自定义组件声明
+  "usingComponents": {}     // 可选项，用于引用别的组件
+}
+其次，我们需要在 dialog.wxml 文件中编写弹窗组件模版，
+在 dialog.wxss 文件中加入弹窗组件样式，它们的写法与页面的写法类似
+
+
+step3
+组件的结构和样式都有了，还缺 js ， 
+在 dialog.wxml 文件中的会有一些比如{{ isShow }}、{{ title }} 这样的模版变量，
+还定义了 _cancelEvent 和 _confirmEvent 两个方法，其具体实现就是在 dialog.js 中。
+dialog.js 是【自定义组件的构造器】，是使用小程序中 Component 构造器生成的，
+调用 Component 构造器时可以用来指定自定义组件的属性、数据、方法等，具体的细节可以参考一下官方的文档
+
+
+step4
+截至目前为止，已经完成了一个自定义弹窗组件的大部分，
+接下来需要在 index.wxml 文件中引入它！
+首先需要在 index.json 中引入组件：
+{
+  "usingComponents": {
+    "dialog": "/components/Dialog/dialog"
+  }
+}
+然后在 index.wxml 中引入它，并增加自定义的一些值，如下：
+<!--index.wxml-->
+<view class="container">
+    <dialog id='dialog' 
+      title='我是标题' 
+      content='恭喜你，学会了小程序组件' 
+      cancelText='知道了' 
+      confirm='谢谢你'
+      bind:cancelEvent="_cancelEvent"  
+      bind:confirmEvent="_confirmEvent">
+    </dialog>
+    
+    <button type="primary" bindtap="showDialog"> ClickMe! </button>
+</view>
+最后一步是index.js 配置：
+//index.js
+//获取应用实例
+const app = getApp()
+Page({
+/**
+* 生命周期函数--监听页面初次渲染完成
+*/
+onReady: function () {
+//获得dialog组件
+this.dialog = this.selectComponent("#dialog");
+},
+showDialog(){
+this.dialog.showDialog();
+},
+//取消事件
+_cancelEvent(){
+console.log('你点击了取消');
+this.dialog.hideDialog();
+},
+//确认事件
+_confirmEvent(){
+console.log('你点击了确定');
+this.dialog.hideDialog();
+}
+})
+
+
